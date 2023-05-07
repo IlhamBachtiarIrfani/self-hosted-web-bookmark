@@ -1,0 +1,39 @@
+version: "3"
+services:
+  frontend:
+    build: ./frontend
+    environment:
+      API_URL: http://backend:3001/ap
+    ports:
+      - "13001:3000"
+    networks:
+      - moi-meow-web-bookmark-network
+  backend:
+    build: ./backend
+    environment:
+      DB_PORT: 3306
+      DB_HOST: database
+      DB_USER: root
+      DB_PASSWORD: moimeowrootpassword
+      DB_NAME: webBookmarkDB
+    ports:
+      - "13002:3001"
+    depends_on:
+      - database
+    networks:
+      - moi-meow-web-bookmark-network
+  database:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: webBookmarkDB
+      MYSQL_ROOT_PASSWORD: moimeowrootpassword
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - "13306:3306"
+    networks:
+      - moi-meow-web-bookmark-network
+
+networks:
+  moi-meow-web-bookmark-network:
+    driver: bridge
