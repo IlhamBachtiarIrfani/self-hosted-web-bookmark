@@ -4,6 +4,8 @@ services:
     build: ./frontend
     environment:
       API_URL: http://backend.local/
+    volumes:
+      - ./backend/public:/app/public
     ports:
       - "13001:3000"
     depends_on:
