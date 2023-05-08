@@ -4,8 +4,6 @@ services:
     build: ./frontend
     environment:
       API_URL: http://backend.local/
-    volumes:
-      - ./backend/public:/app/public
     ports:
       - "13001:3000"
     depends_on:
@@ -20,6 +18,8 @@ services:
       DB_USER: root
       DB_PASSWORD: moimeowrootpassword
       DB_NAME: webBookmarkDB
+    volumes:
+      - ./backend/public:/app/public
     ports:
       - "13002:3001"
     depends_on:
