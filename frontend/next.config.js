@@ -5,7 +5,11 @@ require('dotenv').config();
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['192.168.1.36'],
+    remotePatterns: [
+      {
+        hostname: "**",
+      },
+    ],
   },
   serverRuntimeConfig: {
     // Will only be available on the server side

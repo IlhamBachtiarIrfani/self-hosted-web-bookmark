@@ -4,7 +4,7 @@ import useLocalStorageState from '@moi-meow/utils/useLocalStorageState';
 import Image from 'next/image'
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 
-const API_BASE_URL = process.env.API_URL || "http://192.168.1.36:13002/";
+const API_BASE_URL = process.env.API_URL || "http://192.168.1.56:13002/";
 
 export default function Home() {
   const dialogRef = useRef<HTMLDialogElement>(null);
