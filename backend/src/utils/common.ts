@@ -20,7 +20,6 @@ export async function takeScreenshot(url) {
         console.log("Taking Screenshot");
         browser = await puppeteer.launch({
             headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox']
-            , executablePath: '/usr/bin/google-chrome-stable'
         });
         const page = await browser.newPage();
 
