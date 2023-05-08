@@ -1,11 +1,11 @@
 import { Sequelize } from 'sequelize';
 const sequelize = new Sequelize({
     dialect: 'mysql',
-    host: 'localhost',
+    host: 'database',
     port: 3306,
     username: 'root',
-    password: '',
-    database: 'webBookmarkDb',
+    password: 'moimeowrootpassword',
+    database: 'webBookmarkDB',
     logging: false,
 });
 

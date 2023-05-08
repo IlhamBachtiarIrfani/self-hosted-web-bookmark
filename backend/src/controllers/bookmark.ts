@@ -116,34 +116,38 @@ export async function createBookmark(req: Request, res: Response) {
     getWebProperties(req, url, bookmark);
 }
 async function getWebProperties(req: Request, url: string, bookmark: Bookmark) {
-    console.log("Run in background")
-    const filename = uuidv4();
-    const data = await ogs({ url: url, timeout: 30000 });
-    const baseUrl = getBaseUrl(url);
+    try {
+        console.log("Run in background")
+        const filename = uuidv4();
+        const data = await ogs({ url: url, timeout: 30000 });
+        const baseUrl = getBaseUrl(url);
 
-    const { result } = data;
+        const { result } = data;
 
-    const { ogTitle, ogDescription, ogLocale, favicon, ogImage } = result;
+        const { ogTitle, ogDescription, ogLocale, favicon, ogImage } = result;
 
-    bookmark.update({
-        pageTitle: ogTitle,
-        description: ogDescription,
-        locale: ogLocale,
-    })
+        bookmark.update({
+            pageTitle: ogTitle,
+            description: ogDescription,
+            locale: ogLocale,
+        })
 
-    if (favicon) {
-        await getFavIcon(baseUrl, bookmark, filename, favicon);
+        if (favicon) {
+            await getFavIcon(baseUrl, bookmark, filename, favicon);
+        }
+
+        if (ogImage && ogImage.length > 0) {
+            await getWebImage(bookmark, filename, ogImage[0]);
+        }
+
+        sendUpdates(req.baseUrl);
+
+        await getScreenshotWeb(bookmark, filename, url)
+
+        sendUpdates(req.baseUrl);
+    } catch (err) {
+        console.error(err);
     }
-
-    if (ogImage && ogImage.length > 0) {
-        await getWebImage(bookmark, filename, ogImage[0]);
-    }
-
-    sendUpdates(req.baseUrl);
-
-    await getScreenshotWeb(bookmark, filename, url)
-
-    sendUpdates(req.baseUrl);
 }
 
 async function getFavIcon(baseUrl: string, bookmark: Bookmark, filename: string, url: string) {
@@ -204,6 +208,9 @@ async function getScreenshotWeb(bookmark: Bookmark, filename: string, url: strin
     try {
         const screenshot = await takeScreenshot(url);
 
+        if (!screenshot) {
+            return;
+        }
         const screenshotFilename = `/public/screenshot/${filename}.webp`;
 
         await fs.promises.writeFile("." + screenshotFilename, screenshot);

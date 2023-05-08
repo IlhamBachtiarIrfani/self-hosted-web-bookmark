@@ -1,9 +1,10 @@
 'use client';
 
 import useLocalStorageState from '@moi-meow/utils/useLocalStorageState';
-import { Console } from 'console';
 import Image from 'next/image'
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
+
+const API_BASE_URL = process.env.API_URL || "http://192.168.1.36:13002/";
 
 export default function Home() {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -23,7 +24,7 @@ export default function Home() {
   const [tagsInput, setTagsInput] = useState("")
 
   useEffect(() => {
-    const source = new EventSource('http://localhost:3001/bookmark/subscribe');
+    const source = new EventSource(`${API_BASE_URL}bookmark/subscribe`);
 
     source.onmessage = function (event) {
       const data = JSON.parse(event.data);
@@ -85,7 +86,7 @@ export default function Home() {
 
     console.log("Inserting data");
 
-    const response = await fetch("http://localhost:3001/bookmark", {
+    const response = await fetch(`${API_BASE_URL}bookmark`, {
       method: "POST",
       body: formData
     })

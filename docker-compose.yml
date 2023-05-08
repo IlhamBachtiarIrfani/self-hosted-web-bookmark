@@ -1,14 +1,16 @@
 version: "3"
 services:
-  frontend:
+  frontend.local:
     build: ./frontend
     environment:
-      API_URL: http://backend:3001/ap
+      API_URL: http://backend.local/
     ports:
       - "13001:3000"
+    depends_on:
+      - backend.local
     networks:
       - moi-meow-web-bookmark-network
-  backend:
+  backend.local:
     build: ./backend
     environment:
       DB_PORT: 3306
