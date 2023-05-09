@@ -10,6 +10,7 @@ services:
       - backend.local
     networks:
       - moi-meow-web-bookmark-network
+    restart: always
   backend.local:
     build: ./backend
     environment:
@@ -25,7 +26,9 @@ services:
     depends_on:
       - database
     networks:
-      - moi-meow-web-bookmark-network
+      moi-meow-web-bookmark-network:
+        ipv4_address: 172.20.0.3
+    restart: always
   database:
     image: mysql:latest
     environment:
@@ -37,7 +40,12 @@ services:
       - "13306:3306"
     networks:
       - moi-meow-web-bookmark-network
+    restart: always
 
 networks:
   moi-meow-web-bookmark-network:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

@@ -11,7 +11,8 @@ app.use((err, req, res, next) => {
 });
 
 app.use(cors({
-  origin: '*'
+  origin: '*',
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 }));
 
 app.use(bodyParser.json());
