@@ -1,8 +1,8 @@
 import express from "express";
-import bookmarkRouter from "./bookmark";
+import bookmarksRouter from "./bookmarks";
 
 const router = express.Router();
 
-router.use('/bookmark', bookmarkRouter);
+router.use('/bookmarks', bookmarksRouter);
 
 export default router;

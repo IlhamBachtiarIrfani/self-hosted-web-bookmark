@@ -4,6 +4,11 @@ import cors from 'cors';
 import router from './routes/index';
 import multer from 'multer';
 
+import swaggerUi from 'swagger-ui-express';
+import apiDocs from './docs/api-docs.json';
+
+import sequelize from './config/database';
+
 const app = express();
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -12,7 +17,7 @@ app.use((err, req, res, next) => {
 
 app.use(cors({
   origin: '*',
-  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
 }));
 
 app.use(bodyParser.json());
@@ -27,9 +32,22 @@ app.get('/', (req, res) => {
 
 app.use('/', router);
 
+var options = {
+  customCssUrl: '/public/api-styles.css'
+};
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(apiDocs, options));
+
 
 const port = process.env.PORT || 3001;
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+// sequelize.sync({ force: false }).then(() => {
+//   console.log('Database migrated successfully.');
+  
+// }).catch((error) => {
+//   console.log('Error migrating database:', error);
+// });
+

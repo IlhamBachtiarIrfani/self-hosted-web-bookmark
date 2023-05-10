@@ -1,8 +1,12 @@
+import Bookmarks from 'models/bookmarks';
+import Tags from 'models/tags';
+import BookmarkTags from 'models/bookmarkTags';
 import { Sequelize } from 'sequelize';
+
 const sequelize = new Sequelize({
     dialect: 'mysql',
-    host: 'database',
-    port: 3306,
+    host: 'localhost',
+    port: 13306,
     username: 'root',
     password: 'moimeowrootpassword',
     database: 'webBookmarkDB',
