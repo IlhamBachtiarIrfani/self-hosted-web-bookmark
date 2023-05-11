@@ -7,10 +7,22 @@ module.exports = {
       bookmarkId: {
         type: Sequelize.UUID,
         primaryKey: true,
+        references: {
+          model: 'Bookmarks',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       tagId: {
         type: Sequelize.UUID,
         primaryKey: true,
+        references: {
+          model: 'Tags',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
