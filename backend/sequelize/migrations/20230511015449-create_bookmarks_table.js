@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
       },
       url: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       pageTitle: {
@@ -34,7 +34,7 @@ module.exports = {
         allowNull: true,
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       locale: {

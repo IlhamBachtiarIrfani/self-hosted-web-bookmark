@@ -1,11 +1,19 @@
 import express from "express";
-import { createBookmark, getAllBookmark } from "../controllers/bookmark";
+import { createBookmark, deleteBookmark, getAllBookmark, getBookmarkById, restoreBookmark, updateBookmark } from "../controllers/bookmark";
 import { baseUrlMiddleware } from "../middleware/common";
 
 const bookmarkRouter = express.Router();
 
 bookmarkRouter.use(baseUrlMiddleware);
+
 bookmarkRouter.get("/", getAllBookmark);
+bookmarkRouter.get("/:id", getBookmarkById);
+
 bookmarkRouter.post("/", createBookmark);
+
+bookmarkRouter.patch("/:id", updateBookmark);
+
+bookmarkRouter.delete("/:id", deleteBookmark);
+bookmarkRouter.post("/:id/restore", restoreBookmark);
 
 export default bookmarkRouter;

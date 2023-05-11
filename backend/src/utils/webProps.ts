@@ -12,7 +12,10 @@ export async function getWebProperties(req: Request, url: string, bookmark: Book
     try {
         console.log("Run in background")
         const filename = uuidv4();
+
+        console.log("Get Web Meta");
         const data = await ogs({ url: url, timeout: 30000 });
+
         const baseUrl = getBaseUrl(url);
 
         const { result } = data;
@@ -36,7 +39,7 @@ export async function getWebProperties(req: Request, url: string, bookmark: Book
         await getScreenshotWeb(bookmark, filename, url)
 
     } catch (err) {
-        console.error(err);
+        console.error("Cant Get Web Props : " + err?.toString());
     }
 }
 

@@ -73,7 +73,6 @@ export async function getAllBookmark(req: Request, res: Response) {
             {
                 model: Tags,
                 as: "tags",
-                attributes: ["id", "name"],
                 through: { attributes: [] },
             },
         ],
@@ -96,8 +95,118 @@ export async function getAllBookmark(req: Request, res: Response) {
     return res.status(200).json(result);
 }
 
+export async function getBookmarkById(req: Request, res: Response) {
+    const id = req.params.id;
+
+    const bookmarks = await Bookmarks.findByPk(id, {
+        include: [
+            {
+                model: Tags,
+                as: "tags",
+                through: { attributes: [] },
+            },
+        ],
+    });
+
+    let itemData = bookmarks;
+
+    if (itemData.favicon) itemData.favicon = req.baseUrl + itemData.favicon;
+    if (itemData.screenshot) itemData.screenshot = req.baseUrl + itemData.screenshot;
+    if (itemData.thumbnail) itemData.thumbnail = req.baseUrl + itemData.thumbnail;
+
+    return res.status(200).json(itemData);
+}
+
+export async function deleteBookmark(req: Request, res: Response) {
+    const id = req.params.id;
+
+    const bookmark = await Bookmarks.findByPk(id);
+
+    if (!bookmark) {
+        return res.status(404).send('Bookmark not found');
+    }
+
+    bookmark.destroy();
+
+    return res.status(200).send('Bookmark deleted');
+}
+
+export async function restoreBookmark(req: Request, res: Response) {
+    const id = req.params.id;
+
+    const bookmark = await Bookmarks.findByPk(id, { paranoid: false });
+
+    if (!bookmark) {
+        return res.status(404).send('Bookmark not found');
+    }
+
+    bookmark.restore();
+
+    return res.status(200).send('Bookmark restored');
+}
+
+export async function updateBookmark(req: Request, res: Response) {
+    const id = req.params.id;
+
+    const title = req.body.title as string;
+    const tags = req.body.tags as string[];
+
+    if (!title) {
+        console.log(req.body);
+        return res.status(400).send('Params not complete');
+    }
+
+    const bookmark = await Bookmarks.findByPk(id);
+
+    if (!bookmark) {
+        return res.status(404).send('Bookmark not found');
+    }
+
+    if (Array.isArray(tags)) {
+        const tagsNotInList = await Tags.findAll({
+            include: [
+                {
+                    model: Bookmarks,
+                    as: "bookmarks",
+                    where: {
+                        id: bookmark.id
+                    }
+                },
+            ],
+            where: {
+                name: {
+                    [Op.notIn]: tags
+                }
+            }
+        });
+
+        tagsNotInList.map(async (tagData) => {
+            const bookmarkTagData = await BookmarkTags.findOne({
+                where: {
+                    bookmarkId: bookmark.id,
+                    tagId: tagData.id,
+                }
+            });
+
+            await bookmarkTagData.destroy();
+        })
+
+        await tags.map(async (tagData) => {
+            await findOrCreateBookmarkTag(bookmark.id, tagData);
+        });
+    }
+
+    await bookmark.update({ title: title });
+    await bookmark.reload();
+
+    return res.status(200).send(bookmark);
+
+}
+
 export async function createBookmark(req: Request, res: Response) {
-    const { title, url, tags } = req.body;
+    const title = req.body.title as string;
+    const url = req.body.url as string;
+    const tags = req.body.tags as string[];
 
     console.log("InsertData");
 
@@ -117,25 +226,7 @@ export async function createBookmark(req: Request, res: Response) {
 
     if (Array.isArray(tags)) {
         await tags.map(async (tagData) => {
-            console.log(tagData);
-
-            const [tag, created] = await Tags.findOrCreate({
-                where: {
-                    name: tagData
-                },
-                defaults: {
-                    name: tagData
-                }
-            });
-
-            if (created) {
-                console.log("New tag created");
-            }
-
-            await BookmarkTags.create({
-                bookmarkId: bookmark.id,
-                tagId: tag.id,
-            })
+            await findOrCreateBookmarkTag(bookmark.id, tagData);
         });
     }
 
@@ -143,4 +234,36 @@ export async function createBookmark(req: Request, res: Response) {
     res.status(201).json(bookmark);
 
     getWebProperties(req, url, bookmark);
+}
+
+async function findOrCreateBookmarkTag(bookmarkId: string, tagData: string) {
+    const [tag, tagCreated] = await Tags.findOrCreate({
+        where: {
+            name: tagData
+        },
+        defaults: {
+            name: tagData
+        },
+        paranoid: false
+    });
+
+    if (tag.deletedAt) {
+        await tag.restore();
+    }
+
+    const [bookmarkTag, bookmarkCreated] = await BookmarkTags.findOrCreate({
+        where: {
+            bookmarkId: bookmarkId,
+            tagId: tag.id,
+        },
+        defaults: {
+            bookmarkId: bookmarkId,
+            tagId: tag.id,
+        },
+        paranoid: false
+    });
+
+    if (bookmarkTag.deletedAt) {
+        await bookmarkTag.restore();
+    }
 }
