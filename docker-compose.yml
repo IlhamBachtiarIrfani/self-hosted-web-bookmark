@@ -26,8 +26,7 @@ services:
     depends_on:
       - database
     networks:
-      moi-meow-web-bookmark-network:
-        ipv4_address: 172.20.0.3
+      - moi-meow-web-bookmark-network
     restart: always
   database:
     image: mysql:latest
