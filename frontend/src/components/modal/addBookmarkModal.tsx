@@ -2,7 +2,7 @@
 
 import useApiBaseUrl from '@moi-meow/utils/useApiBaseUrl';
 import useBaseUrl from '@moi-meow/utils/useBaseUrl';
-import React, { ChangeEvent, FormEvent, forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import React, { ChangeEvent, FormEvent, forwardRef, useImperativeHandle, useRef, useState, MouseEvent } from 'react'
 
 interface AddBookmarkModalProps {
     onAddBookmarkComplete?: () => void;
@@ -89,8 +89,21 @@ const AddBookmarkModal = forwardRef<AddBookmarkModalRef, AddBookmarkModalProps>(
         if (props.onAddBookmarkComplete) props.onAddBookmarkComplete()
     }
 
+
+    function onBackdropClick(event: MouseEvent<HTMLDialogElement>) {
+        var rect = dialogRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        var isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height
+            && rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
+
+        if (!isInDialog) {
+            dialogRef.current?.close();
+        }
+    }
+
     return (
-        <dialog className='backdrop:bg-black/50 w-96 rounded-2xl p-5' ref={dialogRef}>
+        <dialog className='backdrop:bg-black/50 w-96 rounded-2xl p-5' ref={dialogRef} onClick={onBackdropClick}>
             <form onSubmit={onCreateSubmit} className='flex flex-col gap-3'>
                 <p>New Bookmark</p>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import useLocalStorageState from '@moi-meow/utils/useLocalStorageState';
-import React, { ChangeEvent, forwardRef, useImperativeHandle, useRef } from 'react'
+import React, { ChangeEvent, forwardRef, useImperativeHandle, useRef, MouseEvent } from 'react'
 import MoiSwitch from '../form/moiSwitch';
 
 interface Props {
@@ -35,8 +35,20 @@ const PropsBookmarkModal = forwardRef<PropsBookmarkModalRef, Props>((props, ref)
         setShowUrl(event.target.checked);
     }
 
+    function onBackdropClick(event: MouseEvent<HTMLDialogElement>) {
+        var rect = dialogRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        var isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height
+            && rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
+
+        if (!isInDialog) {
+            dialogRef.current?.close();
+        }
+    }
+
     return (
-        <dialog className='backdrop:bg-black/50 w-96 rounded-2xl p-5' ref={dialogRef}>
+        <dialog className='backdrop:bg-black/50 w-96 rounded-2xl p-5' ref={dialogRef} onClick={onBackdropClick}>
             <div className='flex flex-col gap-3'>
                 <MoiSwitch label='Bookmark Tags' value={showTags} onChange={setShowTags} />
                 <MoiSwitch label='Website URL' value={showUrl} onChange={setShowUrl} />

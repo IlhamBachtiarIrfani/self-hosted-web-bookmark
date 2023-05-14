@@ -100,7 +100,7 @@ export default function BookmarkItem(props: BookmarkItemProps) {
                     <p className='font-medium line-clamp-1'>{props.showPageTitle && props.item.pageTitle ? props.item.pageTitle : props.item.title}</p>
                 </div>
 
-                {props.showUrl && <p className='text-xs text-indigo-500 line-clamp-1'>{props.item.url}</p>}
+                {props.showUrl && <p className='text-xs text-indigo-500 line-clamp-1 break-all'>{props.item.url}</p>}
 
                 {props.showDesc && <p className='text-xs text-gray-400 line-clamp-2'>{props.item.description}</p>}
 
@@ -125,9 +125,15 @@ interface BookmarkItemCompletePreviewProps {
 
 function BookmarkItemCompletePreview(props: BookmarkItemCompletePreviewProps) {
     return <>
-        <Image alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover group-hover:scale-105 group-hover:blur-sm group-focus:scale-105 group-focus:blur-sm group-hover:opacity-0 group-focus:opacity-0 transition-all duration-700' width={1280} height={720} priority />
+        <picture>
+            <img alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover group-hover:scale-105 group-hover:blur-sm group-focus:scale-105 group-focus:blur-sm group-hover:opacity-0 group-focus:opacity-0 transition-all duration-700' />
+        </picture>
 
-        <Image alt='screenshot' src={props.screenshot} className='absolute inset-0 object-cover scale-95 opacity-0 group-hover:scale-100 group-focus:scale-100 group-hover:opacity-100 group-focus:opacity-100 blur-sm group-hover:blur-none group-focus:blur-none transition-all duration-700' width={1280} height={720} priority />
+        <div className='absolute inset-0'>
+            <picture>
+                <img alt='screenshot' src={props.screenshot} className='object-cover scale-95 opacity-0 group-hover:scale-100 group-focus:scale-100 group-hover:opacity-100 group-focus:opacity-100 blur-sm group-hover:blur-none group-focus:blur-none transition-all duration-700 rounded-xl overflow-hidden' />
+            </picture>
+        </div>
     </>
 }
 
