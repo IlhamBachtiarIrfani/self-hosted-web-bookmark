@@ -6,8 +6,13 @@ import Tags from "../models/tags";
 import BookmarkTags from "../models/bookmarkTags";
 import { getWebProperties } from "../utils/webProps";
 import sequelize from "sequelize";
+import EventEmitter from "events";
+
+export const eventEmitter = new EventEmitter();
 
 export async function getAllBookmark(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'getData' });
+
     const search = req.query.search as string;
     const tags = req.query.tags as string[];
 
@@ -96,6 +101,8 @@ export async function getAllBookmark(req: Request, res: Response) {
 }
 
 export async function getBookmarkById(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'getDataById' });
+
     const id = req.params.id;
 
     const bookmarks = await Bookmarks.findByPk(id, {
@@ -118,6 +125,8 @@ export async function getBookmarkById(req: Request, res: Response) {
 }
 
 export async function deleteBookmark(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'deleteData' });
+
     const id = req.params.id;
 
     const bookmark = await Bookmarks.findByPk(id);
@@ -128,10 +137,14 @@ export async function deleteBookmark(req: Request, res: Response) {
 
     bookmark.destroy();
 
+    eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'bookmarkDeleted' });
+
     return res.status(200).send('Bookmark deleted');
 }
 
 export async function restoreBookmark(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'restoreData' });
+
     const id = req.params.id;
 
     const bookmark = await Bookmarks.findByPk(id, { paranoid: false });
@@ -142,10 +155,14 @@ export async function restoreBookmark(req: Request, res: Response) {
 
     bookmark.restore();
 
+    eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'bookmarkRestored' });
+
     return res.status(200).send('Bookmark restored');
 }
 
 export async function updateBookmark(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'updateData' });
+
     const id = req.params.id;
 
     const title = req.body.title as string;
@@ -199,11 +216,15 @@ export async function updateBookmark(req: Request, res: Response) {
     await bookmark.update({ title: title });
     await bookmark.reload();
 
+    eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'bookmarkUpdated' });
+
     return res.status(200).send(bookmark);
 
 }
 
 export async function createBookmark(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'addData' });
+
     const title = req.body.title as string;
     const url = req.body.url as string;
     const tags = req.body.tags as string[];
@@ -232,6 +253,8 @@ export async function createBookmark(req: Request, res: Response) {
 
     await bookmark.reload();
     res.status(201).json(bookmark);
+
+    eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'bookmarkCreated' });
 
     getWebProperties(req, url, bookmark);
 }
@@ -267,3 +290,32 @@ async function findOrCreateBookmarkTag(bookmarkId: string, tagData: string) {
         await bookmarkTag.restore();
     }
 }
+
+export let subscribeBookmarkClients: Array<Response> = [];
+
+export async function subscribeBookmark(req: Request, res: Response) {
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    });
+
+    subscribeBookmarkClients.push(res);
+    eventEmitter.emit('update', { data: "clientConnected" });
+
+    req.on('close', function () {
+        subscribeBookmarkClients = subscribeBookmarkClients.filter(function (client) {
+            return client !== res;
+        });
+        eventEmitter.emit('update', { data: "clientDisconnected" });
+    });
+}
+
+eventEmitter.on('update', (data) => {
+    console.log("Event : " + JSON.stringify(data));
+
+    subscribeBookmarkClients.forEach((client) => {
+        client.write('data: ' + JSON.stringify(data) + '\n\n');
+        client.flushHeaders();
+    });
+});
