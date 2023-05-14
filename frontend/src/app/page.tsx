@@ -2,17 +2,21 @@
 
 import Header from '@moi-meow/components/common/moiHeader';
 import MoiModalProvider from '@moi-meow/components/common/moiModal';
+import MoiNotifProvider, { useNotif } from '@moi-meow/components/common/moiNotification';
 import MoiButton from '@moi-meow/components/form/moiButton';
 import BookmarkItem from '@moi-meow/components/item/bookmarkItem';
 import AddBookmarkModal, { AddBookmarkModalRef } from '@moi-meow/components/modal/addBookmarkModal';
 import PropsBookmarkModal, { PropsBookmarkModalRef } from '@moi-meow/components/modal/propsBookmarkModal';
 import { BookmarkItemData } from '@moi-meow/utils/bookmark';
-import { API_BASE_URL } from '@moi-meow/utils/common';
+import useApiBaseUrl from '@moi-meow/utils/useApiBaseUrl';
+import useBaseUrl from '@moi-meow/utils/useBaseUrl';
 import useLocalStorageState from '@moi-meow/utils/useLocalStorageState';
-import Image from 'next/image'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function Home() {
+  const API_BASE_URL = useApiBaseUrl();
+
+  const useMoiNotif = useNotif();
   const timeoutIdRef = useRef<NodeJS.Timeout>();
 
   const addBookmarkRef = useRef<AddBookmarkModalRef>(null);
@@ -28,12 +32,39 @@ export default function Home() {
   const [data, setData] = useState<Array<BookmarkItemData>>([]);
 
   useEffect(() => {
-    getBookmarkData();
+    if (API_BASE_URL) {
 
-    return () => {
+      console.log("First call on mount..");
+      console.log(API_BASE_URL);
 
+      const source = handleEventSource();
+      getBookmarkData();
+
+
+      return () => {
+        source.close();
+        console.log("Cleanup..");
+      }
     }
-  }, [])
+  }, [API_BASE_URL])
+
+  function handleEventSource() {
+    const source = new EventSource(`${API_BASE_URL}bookmarks/subscribe`);
+
+    source.onmessage = function (event) {
+      const jsonData = JSON.parse(event.data);
+      if (jsonData.notification === "dataUpdated") {
+        getBookmarkData();
+
+        useMoiNotif.addNotif({
+          title: "Data Updated",
+          desc: jsonData.detail
+        });
+      }
+    };
+
+    return source;
+  }
 
   useEffect(() => {
     if (timeoutIdRef.current) {
@@ -49,6 +80,8 @@ export default function Home() {
   }, [searchQuery])
 
   async function getBookmarkData() {
+    if (!API_BASE_URL) return;
+
     const response = await fetch(`${API_BASE_URL}bookmarks?search=${searchQuery}`);
     const jsonData = await response.json();
 
@@ -56,21 +89,19 @@ export default function Home() {
   }
 
   return (
-    <MoiModalProvider>
-      <main className="flex min-h-screen flex-col items-center gap-3 bg-gray-200 text-black">
-        <AddBookmarkModal ref={addBookmarkRef} onAddBookmarkComplete={getBookmarkData} />
-        <PropsBookmarkModal ref={propsBookmarkRef} />
+    <main className="flex min-h-screen flex-col items-center gap-3 bg-gray-200 text-black">
+      <AddBookmarkModal ref={addBookmarkRef} onAddBookmarkComplete={getBookmarkData} />
+      <PropsBookmarkModal ref={propsBookmarkRef} />
 
-        <Header setSearchQuery={setSearchQuery} searchQuery={searchQuery} onClickConfig={propsBookmarkRef.current?.openDialog} onClickNewBookmark={addBookmarkRef.current?.openDialog} />
+      <Header setSearchQuery={setSearchQuery} searchQuery={searchQuery} onClickConfig={propsBookmarkRef.current?.openDialog} onClickNewBookmark={addBookmarkRef.current?.openDialog} />
 
-        <div className='auto-grid gap-3 py-3 px-10'>
-          {
-            data.map((item, index) => {
-              return <BookmarkItem key={item.id ?? index} item={item} index={index} showUrl={showUrl} showDesc={showDesc} showTags={showTags} showPageTitle={showPageTitle} onRequestUpdateData={getBookmarkData} />
-            })
-          }
-        </div>
-      </main>
-    </MoiModalProvider>
+      <div className='auto-grid gap-3 py-3 px-10'>
+        {
+          data.map((item, index) => {
+            return <BookmarkItem key={item.id ?? index} item={item} index={index} showUrl={showUrl} showDesc={showDesc} showTags={showTags} showPageTitle={showPageTitle} onRequestUpdateData={getBookmarkData} />
+          })
+        }
+      </div>
+    </main>
   )
 }

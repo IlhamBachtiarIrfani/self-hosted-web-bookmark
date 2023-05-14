@@ -1,6 +1,7 @@
 'use client';
 
-import { API_BASE_URL } from '@moi-meow/utils/common';
+import useApiBaseUrl from '@moi-meow/utils/useApiBaseUrl';
+import useBaseUrl from '@moi-meow/utils/useBaseUrl';
 import React, { ChangeEvent, FormEvent, forwardRef, useImperativeHandle, useRef, useState } from 'react'
 
 interface AddBookmarkModalProps {
@@ -13,14 +14,25 @@ export interface AddBookmarkModalRef {
 }
 
 const AddBookmarkModal = forwardRef<AddBookmarkModalRef, AddBookmarkModalProps>((props, ref) => {
+    const API_BASE_URL = useApiBaseUrl();
+
     const dialogRef = useRef<HTMLDialogElement>(null);
 
     const [titleInput, setTitleInput] = useState("")
     const [urlInput, setUrlInput] = useState("")
     const [tagsInput, setTagsInput] = useState("")
 
-    const closeDialog = () => { dialogRef.current?.close() };
-    const openDialog = () => { dialogRef.current?.showModal() };
+    const closeDialog = () => {
+        dialogRef.current?.classList.remove("show");
+
+        setTimeout(() => {
+            dialogRef.current?.close();
+        }, 300);
+    };
+    const openDialog = () => {
+        dialogRef.current?.showModal();
+        dialogRef.current?.classList.add("show");
+    };
 
     useImperativeHandle(ref, () => ({
         closeDialog,
@@ -46,7 +58,7 @@ const AddBookmarkModal = forwardRef<AddBookmarkModalRef, AddBookmarkModalProps>(
         if (!titleInput || !urlInput) {
             return;
         }
-        
+
         closeDialog();
 
         const formData = new FormData();

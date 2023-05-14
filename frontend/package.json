@@ -16,6 +16,7 @@
     "@types/node": "20.0.0",
     "@types/react": "18.2.5",
     "@types/react-dom": "18.2.3",
+    "@types/ws": "^8.5.4",
     "autoprefixer": "10.4.14",
     "dotenv": "^16.0.3",
     "eslint": "8.39.0",
@@ -24,7 +25,9 @@
     "postcss": "8.4.23",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-use-websocket": "^4.3.1",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "ws": "^8.13.0"
   }
 }

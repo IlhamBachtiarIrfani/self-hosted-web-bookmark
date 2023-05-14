@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useContext, createContext, ReactNode, useRef } from "react";
 import MoiButton from "../form/moiButton";
 

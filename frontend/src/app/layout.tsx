@@ -1,5 +1,7 @@
 import './globals.css'
 import { Montserrat } from 'next/font/google'
+import MoiModalProvider from '@moi-meow/components/common/moiModal'
+import MoiNotifProvider from '@moi-meow/components/common/moiNotification'
 
 const montserrat = Montserrat({ subsets: ['latin'] })
 
@@ -15,7 +17,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={montserrat.className}>{children}</body>
+      <body className={montserrat.className}>
+        <MoiNotifProvider>
+          <MoiModalProvider>
+            {children}
+          </MoiModalProvider>
+        </MoiNotifProvider>
+      </body>
     </html>
   )
 }

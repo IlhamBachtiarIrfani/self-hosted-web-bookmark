@@ -6,7 +6,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import CachedRoundedIcon from '@mui/icons-material/CachedRounded';
 import { useModal } from '../common/moiModal';
 import MoiButton from '../form/moiButton';
-import { API_BASE_URL } from '@moi-meow/utils/common';
+import useApiBaseUrl from '@moi-meow/utils/useApiBaseUrl';
 
 interface BookmarkItemProps {
     item: BookmarkItemData;
@@ -19,6 +19,8 @@ interface BookmarkItemProps {
 }
 
 export default function BookmarkItem(props: BookmarkItemProps) {
+    const API_BASE_URL = useApiBaseUrl();
+
     const useMoiModal = useModal();
     const getThumbnailComponent = () => {
         if (props.item.thumbnail && props.item.screenshot) {
@@ -45,7 +47,7 @@ export default function BookmarkItem(props: BookmarkItemProps) {
     async function onRefreshClick(e: MouseEvent<HTMLButtonElement>) {
         e.stopPropagation();
         e.preventDefault();
-        
+
         const response = await fetch(`${API_BASE_URL}bookmarks/${props.item.id}/refresh`, {
             method: "POST"
         });
@@ -72,15 +74,17 @@ export default function BookmarkItem(props: BookmarkItemProps) {
     return (
         <a href={props.item.url ?? "#"} target='_blank' key={props.item.id ?? props.index} className={`group w-full flex flex-col bg-white rounded-2xl p-1 hover:scale-110 focus:scale-110 hover:-rotate-2 focus:-rotate-2 hover:z-10 focus:z-10 hover:shadow-2xl focus:shadow-2xl outline-none border-none transition-all duration-300`}>
             <div className='aspect-video rounded-xl overflow-hidden relative'>
-                <button onClick={onDeleteClick} className='absolute top-2 right-2 p-2 bg-red-700/60 backdrop-blur-sm hover:bg-red-500 hover:scale-110 z-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100'>
+                <button onClick={onDeleteClick} className='absolute top-2 right-2 p-2 bg-red-700/60 backdrop-blur-sm hover:bg-red-500 hover:scale-110 z-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100' tabIndex={-1}>
                     <DeleteOutlineRoundedIcon fontSize="small" className="text-white" />
                 </button>
 
-                <button onClick={onRefreshClick} className='absolute top-2 right-12 p-2 bg-gray-950/40 backdrop-blur-sm hover:bg-indigo-500 hover:scale-110 z-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100'>
+                <button onClick={onRefreshClick} className='absolute top-2 right-12 p-2 bg-gray-950/40 backdrop-blur-sm hover:bg-indigo-500 hover:scale-110 z-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100' tabIndex={-1}>
                     <CachedRoundedIcon fontSize="small" className="text-white" />
                 </button>
 
-                {getThumbnailComponent()}
+                <div className='w-full h-full rounded-xl overflow-hidden'>
+                    {getThumbnailComponent()}
+                </div>
             </div>
 
             <div className='p-2 flex flex-col gap-1'>
@@ -121,9 +125,9 @@ interface BookmarkItemCompletePreviewProps {
 
 function BookmarkItemCompletePreview(props: BookmarkItemCompletePreviewProps) {
     return <>
-        <Image alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover group-hover:scale-105 group-hover:blur-sm group-focus:scale-105 group-focus:blur-sm group-hover:opacity-0 group-focus:opacity-0 transition-all duration-700' width={1280} height={720} />
+        <Image alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover group-hover:scale-105 group-hover:blur-sm group-focus:scale-105 group-focus:blur-sm group-hover:opacity-0 group-focus:opacity-0 transition-all duration-700' width={1280} height={720} priority />
 
-        <Image alt='screenshot' src={props.screenshot} className='absolute inset-0 object-cover scale-95 opacity-0 group-hover:scale-100 group-focus:scale-100 group-hover:opacity-100 group-focus:opacity-100 blur-sm group-hover:blur-none group-focus:blur-none transition-all duration-700' width={1280} height={720} />
+        <Image alt='screenshot' src={props.screenshot} className='absolute inset-0 object-cover scale-95 opacity-0 group-hover:scale-100 group-focus:scale-100 group-hover:opacity-100 group-focus:opacity-100 blur-sm group-hover:blur-none group-focus:blur-none transition-all duration-700' width={1280} height={720} priority />
     </>
 }
 
@@ -132,5 +136,5 @@ interface BookmarkItemPreviewProps {
 }
 
 function BookmarkItemPreview(props: BookmarkItemPreviewProps) {
-    return <Image alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover' width={1280} height={720} />;
+    return <Image alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover' width={1280} height={720} priority />;
 }
