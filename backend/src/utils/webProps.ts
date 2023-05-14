@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request } from "express";
 import ogs from 'open-graph-scraper';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,11 +7,13 @@ import { ImageObject } from "open-graph-scraper/dist/lib/types";
 import { getBaseUrl, isValidUrl, takeScreenshot } from "../utils/common";
 
 import Bookmark from "../models/bookmarks";
+import { eventEmitter } from "../controllers/bookmark";
 
 export async function getWebProperties(req: Request, url: string, bookmark: Bookmark) {
+    console.log("Run in background")
+    const filename = uuidv4();
+
     try {
-        console.log("Run in background")
-        const filename = uuidv4();
 
         console.log("Get Web Meta");
         const data = await ogs({ url: url, timeout: 30000 });
@@ -28,6 +30,8 @@ export async function getWebProperties(req: Request, url: string, bookmark: Book
             locale: ogLocale,
         })
 
+        eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'newMeta' });
+
         if (favicon) {
             await getFavIcon(baseUrl, bookmark, filename, favicon);
         }
@@ -35,12 +39,11 @@ export async function getWebProperties(req: Request, url: string, bookmark: Book
         if (ogImage && ogImage.length > 0) {
             await getWebImage(bookmark, filename, ogImage[0]);
         }
-
-        await getScreenshotWeb(bookmark, filename, url)
-
     } catch (err) {
         console.error("Cant Get Web Props : " + err?.toString());
     }
+
+    await getScreenshotWeb(bookmark, filename, url)
 }
 
 async function getFavIcon(baseUrl: string, bookmark: Bookmark, filename: string, url: string) {
@@ -65,6 +68,8 @@ async function getFavIcon(baseUrl: string, bookmark: Bookmark, filename: string,
         await bookmark.update({
             favicon: favIconFilename,
         })
+
+        eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'newFavicon' });
     } catch (err) {
         console.error(err);
         console.log("Can't save favicon : " + url);
@@ -91,6 +96,8 @@ async function getWebImage(bookmark: Bookmark, filename: string, image: ImageObj
             thumbnail: imageFilename,
         })
 
+        eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'newThumbnail' });
+
     } catch (err) {
         console.error(err);
         console.log("Can't save image : " + image.url);
@@ -113,6 +120,8 @@ async function getScreenshotWeb(bookmark: Bookmark, filename: string, url: strin
         await bookmark.update({
             screenshot: screenshotFilename,
         })
+
+        eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'newScreenshot' });
     } catch (err) {
         console.error(err);
         console.log("Can't save screenshot : " + url);

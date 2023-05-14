@@ -1,11 +1,12 @@
 import express from "express";
-import { createBookmark, deleteBookmark, getAllBookmark, getBookmarkById, restoreBookmark, updateBookmark } from "../controllers/bookmark";
+import { createBookmark, deleteBookmark, getAllBookmark, getBookmarkById, restoreBookmark, subscribeBookmark, updateBookmark } from "../controllers/bookmark";
 import { baseUrlMiddleware } from "../middleware/common";
 
 const bookmarkRouter = express.Router();
 
 bookmarkRouter.use(baseUrlMiddleware);
 
+bookmarkRouter.get("/subscribe", subscribeBookmark);
 bookmarkRouter.get("/", getAllBookmark);
 bookmarkRouter.get("/:id", getBookmarkById);
 
