@@ -39,7 +39,7 @@ const MoiNotifProvider = ({ children }: MoiNotifProviderProps) => {
     return (
         <ModalContext.Provider value={{ addNotif }}>
             {children}
-            <div className="absolute z-50 top-16 right-0 bottom-0 flex flex-col gap-2 p-3 w-full max-w-sm overflow-hidden">
+            <div className="absolute z-50 top-16 right-0 flex flex-col gap-2 p-3 w-full max-w-sm">
                 {
                     notifData.map((item, index) => {
                         return <div key={item.key ?? item.title} className="bg-white p-3 rounded-2xl shadow-xl animate-notif flex gap-3">

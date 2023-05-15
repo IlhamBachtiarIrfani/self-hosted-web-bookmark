@@ -5,8 +5,6 @@ import MoiModalProvider from '@moi-meow/components/common/moiModal';
 import MoiNotifProvider, { useNotif } from '@moi-meow/components/common/moiNotification';
 import MoiButton from '@moi-meow/components/form/moiButton';
 import BookmarkItem from '@moi-meow/components/item/bookmarkItem';
-import AddBookmarkModal, { AddBookmarkModalRef } from '@moi-meow/components/modal/addBookmarkModal';
-import PropsBookmarkModal, { PropsBookmarkModalRef } from '@moi-meow/components/modal/propsBookmarkModal';
 import { BookmarkItemData } from '@moi-meow/utils/bookmark';
 import useApiBaseUrl from '@moi-meow/utils/useApiBaseUrl';
 import useBaseUrl from '@moi-meow/utils/useBaseUrl';
@@ -18,9 +16,6 @@ export default function Home() {
 
   const useMoiNotif = useNotif();
   const timeoutIdRef = useRef<NodeJS.Timeout>();
-
-  const addBookmarkRef = useRef<AddBookmarkModalRef>(null);
-  const propsBookmarkRef = useRef<PropsBookmarkModalRef>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -90,10 +85,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-3 bg-gray-200 text-black">
-      <AddBookmarkModal ref={addBookmarkRef} onAddBookmarkComplete={getBookmarkData} />
-      <PropsBookmarkModal ref={propsBookmarkRef} />
-
-      <Header setSearchQuery={setSearchQuery} searchQuery={searchQuery} onClickConfig={propsBookmarkRef.current?.openDialog} onClickNewBookmark={addBookmarkRef.current?.openDialog} />
+      <Header setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>
 
       <div className='auto-grid gap-3 py-3 px-10'>
         {

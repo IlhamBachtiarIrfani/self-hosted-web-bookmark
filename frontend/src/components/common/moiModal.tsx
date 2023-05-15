@@ -24,13 +24,26 @@ const MoiModalProvider = ({ children }: MoiModalProviderProps) => {
     const [modalContent, setModalContent] = useState<ReactNode | null>(null);
 
     const showModal = (content: ReactNode) => {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
         setModalContent(content);
-        dialogRef.current?.showModal();
+
+        dialog.showModal()
+        dialog.classList.add("show")
     };
 
     const hideModal = () => {
-        dialogRef.current?.close();
-        setModalContent(null);
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
+        dialog.classList.remove("show");
+        dialog.classList.add("hide");
+        setTimeout(() => {
+            dialog.close()
+            dialog.classList.remove("hide");
+            setModalContent(null);
+        }, 300);
     };
 
     function onBackdropClick(event: MouseEvent<HTMLDialogElement>) {
@@ -41,17 +54,18 @@ const MoiModalProvider = ({ children }: MoiModalProviderProps) => {
             && rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
 
         if (!isInDialog) {
-            dialogRef.current?.close();
+            hideModal();
         }
     }
 
     return (
         <ModalContext.Provider value={{ showModal, hideModal }}>
             {children}
-            <dialog className='backdrop:bg-black/50 w-96 rounded-2xl p-5' ref={dialogRef} onClick={onBackdropClick}>
-                <div className="bg-white p-3 rounded-xl">
-                    {modalContent}
-                </div>
+            <dialog className='backdrop:bg-black/50 p-5 rounded-2xl w-full max-w-fit' ref={dialogRef} onClick={onBackdropClick} onCancel={(e) => {
+                e.preventDefault();
+                hideModal();
+            }}>
+                {modalContent}
             </dialog>
         </ModalContext.Provider>
     );

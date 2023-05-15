@@ -7,3 +7,15 @@
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
 }
+
+dialog::backdrop {
+	@apply bg-black/40 backdrop-blur-sm;
+}
+
+dialog {
+	@apply transition-all duration-300 opacity-0 scale-90;
+}
+
+dialog.show {
+	@apply opacity-100 scale-100;
+}
