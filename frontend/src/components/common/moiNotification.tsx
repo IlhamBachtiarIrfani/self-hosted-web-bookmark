@@ -24,7 +24,6 @@ type MoiNotifProviderProps = {
 };
 
 const MoiNotifProvider = ({ children }: MoiNotifProviderProps) => {
-    const dialogRef = useRef<HTMLDialogElement>(null);
     const [notifData, setNotifData] = useState<Array<NotifData>>([])
 
     const addNotif = (newData: NotifData) => {

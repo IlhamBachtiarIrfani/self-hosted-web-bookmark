@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useContext, createContext, ReactNode, useRef, MouseEvent } from "react";
-import MoiButton from "../form/moiButton";
 
 type ModalContextType = {
     showModal: (content: ReactNode) => void;

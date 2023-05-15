@@ -8,7 +8,7 @@ interface AddBookmarkModalProps {
     onClose: () => void;
 }
 
-export default function AddBookmarkModal(props:AddBookmarkModalProps) {
+export default function AddBookmarkModal(props: AddBookmarkModalProps) {
     const API_BASE_URL = useApiBaseUrl();
 
     const [titleInput, setTitleInput] = useState("")
@@ -63,20 +63,21 @@ export default function AddBookmarkModal(props:AddBookmarkModalProps) {
         console.log("insert: " + responseJSON.toString());
     }
 
-    return <form onSubmit={onCreateSubmit} className='w-screen max-w-md flex flex-col gap-3'>
-                <p>New Bookmark</p>
+    return (
+        <form onSubmit={onCreateSubmit} className='w-screen max-w-md flex flex-col gap-3'>
+            <p>New Bookmark</p>
 
-                <input type='text' placeholder='Bookmark Title' className='h-10 w-full rounded-md bg-gray-100 px-3 focus:outline-none focus:ring-2 ring-indigo-500' onChange={onTitleInputChange} value={titleInput} />
+            <input type='text' placeholder='Bookmark Title' className='h-10 w-full rounded-md bg-gray-100 px-3 focus:outline-none focus:ring-2 ring-indigo-500' onChange={onTitleInputChange} value={titleInput} />
 
-                <input type='url' placeholder='Website Url' className='h-10 w-full rounded-md bg-gray-100 px-3 focus:outline-none focus:ring-2 ring-indigo-500' onChange={onUrlInputChange} value={urlInput} />
+            <input type='url' placeholder='Website Url' className='h-10 w-full rounded-md bg-gray-100 px-3 focus:outline-none focus:ring-2 ring-indigo-500' onChange={onUrlInputChange} value={urlInput} />
 
-                <input type='text' placeholder='Tags A, Tags B, Tags C' className='h-10 w-full rounded-md bg-gray-100 px-3 focus:outline-none focus:ring-2 ring-indigo-500' onChange={onTagsInputChange} value={tagsInput} />
+            <input type='text' placeholder='Tags A, Tags B, Tags C' className='h-10 w-full rounded-md bg-gray-100 px-3 focus:outline-none focus:ring-2 ring-indigo-500' onChange={onTagsInputChange} value={tagsInput} />
 
-                <div className='flex w-full justify-end gap-3'>
-                    <button className='border-indigo-500 border text-indigo-500 hover:bg-indigo-500 hover:text-white rounded-md px-3 py-2  focus:outline-0 hover:ring-4 focus:ring-4 ring-indigo-500/50 transition-all  ' onClick={props.onClose} type='button' >Cancel</button>
+            <div className='flex w-full justify-end gap-3'>
+                <button className='border-indigo-500 border text-indigo-500 hover:bg-indigo-500 hover:text-white rounded-md px-3 py-2  focus:outline-0 hover:ring-4 focus:ring-4 ring-indigo-500/50 transition-all  ' onClick={props.onClose} type='button' >Cancel</button>
 
-                    <button className='bg-indigo-500 text-white rounded-md px-3 py-2 focus:outline-0 hover:ring-4 focus:ring-4 ring-indigo-500/50 transition-all' type='submit'>Submit</button>
-                </div>
-            </form>
-        
+                <button className='bg-indigo-500 text-white rounded-md px-3 py-2 focus:outline-0 hover:ring-4 focus:ring-4 ring-indigo-500/50 transition-all' type='submit'>Submit</button>
+            </div>
+        </form>
+    )
 };

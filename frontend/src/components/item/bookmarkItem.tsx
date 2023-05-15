@@ -22,7 +22,7 @@ export default function BookmarkItem(props: BookmarkItemProps) {
     const API_BASE_URL = useApiBaseUrl();
 
     const useMoiModal = useModal();
-    const getThumbnailComponent = () => {
+    function getThumbnailComponent() {
         if (props.item.thumbnail && props.item.screenshot) {
             return <BookmarkItemCompletePreview thumbnail={props.item.thumbnail} screenshot={props.item.screenshot} />
         } else if (props.item.thumbnail != null || props.item.screenshot != null) {

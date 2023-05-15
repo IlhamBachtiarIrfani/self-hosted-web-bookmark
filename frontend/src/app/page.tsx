@@ -1,15 +1,12 @@
 'use client';
 
 import Header from '@moi-meow/components/common/moiHeader';
-import MoiModalProvider from '@moi-meow/components/common/moiModal';
-import MoiNotifProvider, { useNotif } from '@moi-meow/components/common/moiNotification';
-import MoiButton from '@moi-meow/components/form/moiButton';
+import { useNotif } from '@moi-meow/components/common/moiNotification';
 import BookmarkItem from '@moi-meow/components/item/bookmarkItem';
 import { BookmarkItemData } from '@moi-meow/utils/bookmark';
 import useApiBaseUrl from '@moi-meow/utils/useApiBaseUrl';
-import useBaseUrl from '@moi-meow/utils/useBaseUrl';
 import useLocalStorageState from '@moi-meow/utils/useLocalStorageState';
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export default function Home() {
   const API_BASE_URL = useApiBaseUrl();
@@ -26,24 +23,18 @@ export default function Home() {
 
   const [data, setData] = useState<Array<BookmarkItemData>>([]);
 
-  useEffect(() => {
-    if (API_BASE_URL) {
+  // ===== GET BOOKMARK DATA FETCH API =====
+  const getBookmarkData = useCallback(async () => {
+    if (!API_BASE_URL) return;
 
-      console.log("First call on mount..");
-      console.log(API_BASE_URL);
+    const response = await fetch(`${API_BASE_URL}bookmarks?search=${searchQuery}`);
+    const jsonData = await response.json();
 
-      const source = handleEventSource();
-      getBookmarkData();
+    setData(jsonData);
+  }, [searchQuery, API_BASE_URL])
 
-
-      return () => {
-        source.close();
-        console.log("Cleanup..");
-      }
-    }
-  }, [API_BASE_URL])
-
-  function handleEventSource() {
+  // ===== ON EVENT IS CHANGE UPDATE BOOKMARK =====
+  const handleEventSource = useCallback(() => {
     const source = new EventSource(`${API_BASE_URL}bookmarks/subscribe`);
 
     source.onmessage = function (event) {
@@ -57,11 +48,11 @@ export default function Home() {
         });
       }
     };
-
     return source;
-  }
+  }, [API_BASE_URL, getBookmarkData, useMoiNotif]);
 
-  useEffect(() => {
+  // ===== ON SEARCH CHANGE ======
+  const onSearchQuery = useCallback(() => {
     if (timeoutIdRef.current) {
       clearTimeout(timeoutIdRef.current);
     }
@@ -72,20 +63,33 @@ export default function Home() {
       clearTimeout(timeoutIdRef.current);
     }
 
-  }, [searchQuery])
+  }, [getBookmarkData])
 
-  async function getBookmarkData() {
-    if (!API_BASE_URL) return;
+  // ===== ON INPUT SEARCH CHANGE =====
+  useEffect(() => {
+    onSearchQuery();
+  }, [searchQuery, onSearchQuery])
 
-    const response = await fetch(`${API_BASE_URL}bookmarks?search=${searchQuery}`);
-    const jsonData = await response.json();
+  // ===== ON APP START =====
+  useCallback(() => {
+    if (API_BASE_URL) {
 
-    setData(jsonData);
-  }
+      console.log("First call on mount..");
+      console.log(API_BASE_URL);
+
+      const source = handleEventSource();
+      getBookmarkData();
+
+      return () => {
+        source.close();
+        console.log("Cleanup..");
+      }
+    }
+  }, [API_BASE_URL, getBookmarkData, handleEventSource])
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-3 bg-gray-200 text-black">
-      <Header setSearchQuery={setSearchQuery} searchQuery={searchQuery}/>
+      <Header setSearchQuery={setSearchQuery} searchQuery={searchQuery} />
 
       <div className='auto-grid gap-3 py-3 px-10'>
         {
