@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const port = 3001;
+const port = process.env.API_PORT;
 
 const useApiBaseUrl = (): string | null => {
     const [baseUrl, setBaseUrl] = useState<string | null>(null);
