@@ -52,7 +52,7 @@ DB_PORT=3306
 
 To migrate the database, open the `backend` directory and run the command.
 ```bash
-docker npx sequelize-cli db:migrate
+npx sequelize-cli db:migrate
 ```
 
 #### Run program
