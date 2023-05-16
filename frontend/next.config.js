@@ -22,6 +22,9 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  env: {
+    API_PORT: process.env.API_PORT,
+  }
 }
 
 module.exports = nextConfig

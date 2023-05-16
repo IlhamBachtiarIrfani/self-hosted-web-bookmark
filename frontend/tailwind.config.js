@@ -17,6 +17,29 @@ module.exports = {
       fontFamily: {
         'sans': ['Montserrat', ...defaultTheme.fontFamily.sans],
       },
+      keyframes: {
+        'slide-in-out': {
+          '0%': {
+            transform: 'translateX(100%)',
+            opacity: '0',
+          },
+          '5%': {
+            opacity: '1',
+            transform: 'translateX(0%)',
+          },
+          '95%': {
+            transform: 'translateX(0%)',
+            opacity: '1',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translateX(100%)',
+          },
+        },
+      },
+      animation: {
+        'notif': 'slide-in-out 5s ease-in-out forwards',
+      },
     },
   },
   plugins: [],

@@ -2,8 +2,6 @@ version: "3"
 services:
   frontend.local:
     build: ./frontend
-    environment:
-      API_URL: http://backend.local/
     ports:
       - "13001:3000"
     depends_on:
@@ -13,12 +11,6 @@ services:
     restart: always
   backend.local:
     build: ./backend
-    environment:
-      DB_PORT: 3306
-      DB_HOST: database
-      DB_USER: root
-      DB_PASSWORD: moimeowrootpassword
-      DB_NAME: webBookmarkDB
     volumes:
       - ./backend/public:/app/public
     ports:
@@ -26,8 +18,7 @@ services:
     depends_on:
       - database
     networks:
-      moi-meow-web-bookmark-network:
-        ipv4_address: 172.20.0.3
+      - moi-meow-web-bookmark-network
     restart: always
   database:
     image: mysql:latest

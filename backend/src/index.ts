@@ -1,8 +1,11 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import router from './routes/index';
 import multer from 'multer';
+
+import swaggerUi from 'swagger-ui-express';
+import apiDocs from './docs/api-docs.json';
 
 const app = express();
 app.use((err, req, res, next) => {
@@ -12,7 +15,7 @@ app.use((err, req, res, next) => {
 
 app.use(cors({
   origin: '*',
-  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
 }));
 
 app.use(bodyParser.json());
@@ -27,8 +30,13 @@ app.get('/', (req, res) => {
 
 app.use('/', router);
 
+var options = {
+  customCssUrl: '/public/api-styles.css'
+};
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(apiDocs, options));
 
-const port = process.env.PORT || 3001;
+
+const port = Number(process.env.PORT) || 3001;
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

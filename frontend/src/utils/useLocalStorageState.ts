@@ -7,10 +7,31 @@ function useLocalStorageState<T>(key: string, initialValue: T): [T, (value: T) =
     });
 
     useEffect(() => {
-        window.localStorage.setItem(key, JSON.stringify(state));
-    }, [key, state]);
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === key && event.newValue !== null) {
+                setState(JSON.parse(event.newValue));
+            }
+        };
 
-    return [state, setState];
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, [key]);
+
+    const setLocalStorageState = (value: T) => {
+        setState(value);
+        window.localStorage.setItem(key, JSON.stringify(value));
+        window.dispatchEvent(new StorageEvent("storage", {
+            key,
+            newValue: JSON.stringify(value),
+            oldValue: JSON.stringify(state),
+            storageArea: window.localStorage,
+        }));
+    };
+
+    return [state, setLocalStorageState];
 }
 
 export default useLocalStorageState;

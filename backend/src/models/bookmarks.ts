@@ -1,25 +1,33 @@
-import { DataTypes, Model } from 'sequelize';
+import { BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, DataTypes, Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../config/database';
+import Tags from './tags';
 
-class Bookmark extends Model {
-    public id!: number;
+export default class Bookmarks extends Model {
+    public id!: string;
     public title!: string;
     public url!: string;
-    public thumbnail!: string | null;
-    public favicon!: string | null;
     public pageTitle!: string | null;
-    public image!: string | null;
+    public thumbnail!: string | null;
+    public screenshot!: string | null;
+    public favicon!: string | null;
     public description!: string | null;
     public locale!: string | null;
+
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
-    public readonly deletedAt!: Date | null;
+    public readonly deletedAt?: Date;
+
+    public readonly tags?: Tags[];
+
+    public addTag!: BelongsToManyAddAssociationMixin<Tags, number>;
+    public getTags!: BelongsToManyGetAssociationsMixin<Tags>;
 }
 
-Bookmark.init({
+Bookmarks.init({
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
     title: {
@@ -30,19 +38,19 @@ Bookmark.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    thumbnail: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    favicon: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
     pageTitle: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    image: {
+    thumbnail: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    screenshot: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    favicon: {
         type: DataTypes.STRING,
         allowNull: true,
     },
@@ -56,9 +64,9 @@ Bookmark.init({
     },
 }, {
     sequelize,
-    modelName: 'Bookmark',
     timestamps: true,
-    paranoid: true, // add this
-});
+    paranoid: true,
+    modelName: 'Bookmarks'
+})
 
-export default Bookmark;
+Bookmarks.beforeCreate((bookmark: Bookmarks) => (bookmark.id = uuidv4()));

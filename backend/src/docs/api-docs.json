@@ -1,0 +1,212 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Moi Meow - Web Bookmark API",
+        "version": "1.0.0 - Dev",
+        "description": "A Simple REST API documentation for Moi Meow - Web Bookmark API public usage."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3001",
+            "description": "Local Server"
+        },
+        {
+            "url": "http://localhost:13002",
+            "description": "Docker Server"
+        },
+        {
+            "url": "http://backend.local:3001",
+            "description": "Container Server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Bookmark",
+            "description": "Bookmark related endpoints"
+        },
+        {
+            "name": "Tag",
+            "description": "Tag related endpoints"
+        }
+    ],
+    "paths": {
+        "/bookmarks": {
+            "get": {
+                "summary": "Get a list of bookmark",
+                "tags": [
+                    "Bookmark"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Bookmark"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create new bookmark",
+                "tags": [
+                    "Bookmark"
+                ],
+                "consumes": [
+                    "multipart/form-data",
+                    "application/x-www-form-urlencoded",
+                    "application/json"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "$ref": "#/components/schemas/Bookmark-Insert"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "$ref": "#/components/schemas/Bookmark-Insert"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "$ref": "#/components/schemas/Bookmark-Insert"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "CREATED",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/Bookmark"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Bookmark": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Moi REST API"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "http://localhost:13002/"
+                    },
+                    "thumbnail": {
+                        "type": "string | null",
+                        "example": "http://localhost:13002/public/screenshot/example.webp"
+                    },
+                    "favicon": {
+                        "type": "string | null",
+                        "example": "http://localhost:13002/public/icon/example.webp"
+                    },
+                    "image": {
+                        "type": "string | null",
+                        "example": "http://localhost:13002/public/image/example.webp"
+                    },
+                    "pageTitle": {
+                        "type": "string | null",
+                        "example": "Moi Meow - Web Bookmark API"
+                    },
+                    "description": {
+                        "type": "string | null",
+                        "example": "This is REST API server for Moi Meow Web Bookmark"
+                    },
+                    "locale": {
+                        "type": "string | null",
+                        "example": "locale/en"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Tag"
+                        }
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "example": "2023-05-10T01:16:40.000Z"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "example": "2023-05-10T01:16:40.000Z"
+                    },
+                    "deletedAt": {
+                        "type": "string | null",
+                        "example": "2023-05-10T01:16:40.000Z"
+                    }
+                }
+            },
+            "Bookmark-Insert": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "example": "Moi REST API"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "http://localhost:13002/"
+                    },
+                    "tags[]": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "Productivity"
+                        }
+                    }
+                }
+            },
+            "Tag": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Productivity"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "example": "2023-05-10T01:16:40.000Z"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "example": "2023-05-10T01:16:40.000Z"
+                    },
+                    "deletedAt": {
+                        "type": "string | null",
+                        "example": "2023-05-10T01:16:40.000Z"
+                    }
+                }
+            }
+        }
+    }
+}
