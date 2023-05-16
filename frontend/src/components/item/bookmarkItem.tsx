@@ -52,8 +52,6 @@ export default function BookmarkItem(props: BookmarkItemProps) {
             method: "POST"
         });
 
-        console.log(response);
-
         props.onRequestUpdateData();
     }
 
@@ -92,7 +90,9 @@ export default function BookmarkItem(props: BookmarkItemProps) {
                     <div className='aspect-square w-5 p-0.5 flex-none'>
                         {
                             props.item.favicon ?
-                                <Image alt='favicon' src={props.item.favicon} width={128} height={128} />
+                                <picture>
+                                    <img alt='favicon' src={props.item.favicon} loading='lazy' />
+                                </picture>
                                 :
                                 <div className='w-full h-full rounded-full bg-gray-200' />
                         }
@@ -124,17 +124,19 @@ interface BookmarkItemCompletePreviewProps {
 }
 
 function BookmarkItemCompletePreview(props: BookmarkItemCompletePreviewProps) {
-    return <>
-        <picture>
-            <img alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover group-hover:scale-105 group-hover:blur-sm group-focus:scale-105 group-focus:blur-sm group-hover:opacity-0 group-focus:opacity-0 transition-all duration-700' />
-        </picture>
-
-        <div className='absolute inset-0'>
+    return (
+        <>
             <picture>
-                <img alt='screenshot' src={props.screenshot} className='object-cover scale-95 opacity-0 group-hover:scale-100 group-focus:scale-100 group-hover:opacity-100 group-focus:opacity-100 blur-sm group-hover:blur-none group-focus:blur-none transition-all duration-700 rounded-xl overflow-hidden' />
+                <img alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover group-hover:scale-105 group-hover:blur-sm group-focus:scale-105 group-focus:blur-sm group-hover:opacity-0 group-focus:opacity-0 transition-all duration-700' loading='lazy' />
             </picture>
-        </div>
-    </>
+
+            <div className='absolute inset-0'>
+                <picture>
+                    <img alt='screenshot' src={props.screenshot} className='object-cover scale-95 opacity-0 group-hover:scale-100 group-focus:scale-100 group-hover:opacity-100 group-focus:opacity-100 blur-sm group-hover:blur-none group-focus:blur-none transition-all duration-700 rounded-xl overflow-hidden' loading='lazy' />
+                </picture>
+            </div>
+        </>
+    )
 }
 
 interface BookmarkItemPreviewProps {
@@ -142,5 +144,9 @@ interface BookmarkItemPreviewProps {
 }
 
 function BookmarkItemPreview(props: BookmarkItemPreviewProps) {
-    return <Image alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover' width={1280} height={720} priority />;
+    return (
+        <picture>
+            <img alt='thumbnail' src={props.thumbnail} className='w-full h-full object-cover' loading='lazy' />
+        </picture>
+    );
 }

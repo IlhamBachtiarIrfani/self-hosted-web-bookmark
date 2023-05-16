@@ -105,7 +105,7 @@ export async function getBookmarkById(req: Request, res: Response) {
 
     const id = req.params.id;
 
-    const bookmarks = await Bookmarks.findByPk(id, {
+    const bookmark = await Bookmarks.findByPk(id, {
         include: [
             {
                 model: Tags,
@@ -115,13 +115,42 @@ export async function getBookmarkById(req: Request, res: Response) {
         ],
     });
 
-    let itemData = bookmarks;
+    if (!bookmark) {
+        return res.status(404).send('Bookmark not found');
+    }
+
+    let itemData = bookmark;
 
     if (itemData.favicon) itemData.favicon = req.baseUrl + itemData.favicon;
     if (itemData.screenshot) itemData.screenshot = req.baseUrl + itemData.screenshot;
     if (itemData.thumbnail) itemData.thumbnail = req.baseUrl + itemData.thumbnail;
 
     return res.status(200).json(itemData);
+}
+
+export async function refreshBookmark(req: Request, res: Response) {
+    eventEmitter.emit('update', { function: 'getDataById' });
+
+    const id = req.params.id;
+
+    const bookmark = await Bookmarks.findByPk(id, {
+        include: [
+            {
+                model: Tags,
+                as: "tags",
+                through: { attributes: [] },
+            },
+        ],
+    });
+
+    if (!bookmark) {
+        return res.status(404).send('Bookmark not found');
+    }
+
+    res.status(200).send('Bookmark will update');
+    eventEmitter.emit('update', { notification: 'dataUpdated', detail: 'bookmarkRefresh' });
+
+    getWebProperties(req, bookmark.url, bookmark);
 }
 
 export async function deleteBookmark(req: Request, res: Response) {

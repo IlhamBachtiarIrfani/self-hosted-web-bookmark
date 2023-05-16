@@ -1,5 +1,5 @@
 import express from "express";
-import { createBookmark, deleteBookmark, getAllBookmark, getBookmarkById, restoreBookmark, subscribeBookmark, updateBookmark } from "../controllers/bookmark";
+import { createBookmark, deleteBookmark, getAllBookmark, getBookmarkById, refreshBookmark, restoreBookmark, subscribeBookmark, updateBookmark } from "../controllers/bookmark";
 import { baseUrlMiddleware } from "../middleware/common";
 
 const bookmarkRouter = express.Router();
@@ -10,6 +10,7 @@ bookmarkRouter.get("/subscribe", subscribeBookmark);
 bookmarkRouter.get("/", getAllBookmark);
 bookmarkRouter.get("/:id", getBookmarkById);
 
+bookmarkRouter.post("/:id/refresh", refreshBookmark);
 bookmarkRouter.post("/", createBookmark);
 
 bookmarkRouter.patch("/:id", updateBookmark);
